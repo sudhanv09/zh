@@ -60,7 +60,6 @@ func getTranslation(article ScrapedResult) OllamaResponse {
 	if err := json.NewDecoder(respBody).Decode(&ollamaResp); err != nil {
 		log.Fatal("Decode failed ", err)
 	}
-
 	return ollamaResp
 }
 

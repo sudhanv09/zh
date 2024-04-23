@@ -53,11 +53,11 @@ func scraper(limit int) []ScrapedResult {
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("visiting", r.URL.String())
+		fmt.Println("Visiting", r.URL.String())
 	})
 
 	articleScraper.OnRequest(func(request *colly.Request) {
-		fmt.Println("Article", request.URL.String())
+		fmt.Println("Scraping article", request.URL.String())
 	})
 
 	c.Visit("https://news.tvbs.com.tw/politics")

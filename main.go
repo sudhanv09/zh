@@ -1,19 +1,16 @@
 package main
 
-import "fmt"
+import "log"
 
 func main() {
 
-	a := scraper(2)
+	results := scraper(2)
 
-	for _, article := range a {
-		t := getTranslation(article)
-
-		evalTime := t.EvalCount / t.EvalDuration
-		fmt.Println(t.Response)
-		fmt.Printf("Token Gen Speed: %d\n", evalTime)
+	for _, article := range results {
+		gen := getTranslation(article)
+		_, err := writeToDisk(article.Link, article.Title, article.Content, gen.Response)
+		if err != nil {
+			log.Fatal("Write failed")
+		}
 	}
-
-	Execute()
-
 }
