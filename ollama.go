@@ -37,9 +37,7 @@ const (
 	Phi    = "phi3:latest"
 
 	ollamaApi  string = "http://localhost:11434/api/generate"
-	basePrompt string = `Help me read and learn chinese. Translate the text for me and give it to me in this form.
-						 Original - Pinyin Translation - English meaning
-						Also give teach me new vocabulary from the text.`
+	basePrompt string = "Translate the text to pinyin. Also teach me 10 words from the text with their english meaning like No. word - meaning."
 )
 
 func getTranslation(article ScrapedResult) OllamaResponse {

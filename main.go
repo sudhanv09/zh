@@ -14,4 +14,6 @@ func main() {
 		fmt.Printf("Token Gen Speed: %d\n", evalTime)
 	}
 
+	Execute()
+
 }
