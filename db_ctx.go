@@ -67,12 +67,12 @@ func writeToDisk(link string, title string, article string, article_gen string) 
 	return nil
 }
 
-func fetchAllArticles() (zh_db.Zh, error) {
+func fetchAllArticles() ([]zh_db.Zh, error) {
 	ctx := context.Background()
 	db, err := sql.Open("sqlite3", "zh.db")
 	if err != nil {
 		log.Fatal("Couldnt open db", err)
-		return zh_db.Zh{}, err
+		return []zh_db.Zh{}, err
 	}
 	defer db.Close()
 
@@ -80,7 +80,7 @@ func fetchAllArticles() (zh_db.Zh, error) {
 	articles, err := queries.GetAll(ctx)
 	if err != nil {
 		log.Fatal("Unable to fetch articles from db")
-		return zh_db.Zh{}, err
+		return []zh_db.Zh{}, err
 	}
 
 	return articles, nil

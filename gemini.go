@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+const gemini = "gemini-pro"
+
 func geminiGen(content string) (*genai.GenerateContentResponse, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API")))
@@ -18,7 +20,7 @@ func geminiGen(content string) (*genai.GenerateContentResponse, error) {
 	}
 	defer client.Close()
 
-	model := client.GenerativeModel("gemini-pro")
+	model := client.GenerativeModel(gemini)
 
 	genText := genai.Text(basePrompt + content)
 	resp, err := model.GenerateContent(ctx, genText)

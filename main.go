@@ -34,8 +34,7 @@ func main() {
 		Use:   "ls",
 		Short: "List all the articles saved",
 		Run: func(cmd *cobra.Command, args []string) {
-			res, _ := fetchAllArticles()
-			fmt.Println(res)
+			ui_init()
 		},
 	}
 

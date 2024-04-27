@@ -1,4 +1,4 @@
--- name: GetAll :one
+-- name: GetAll :many
 select * from zh;
 
 -- name: GetById :one
