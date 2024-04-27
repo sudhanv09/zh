@@ -1,7 +1,8 @@
-package main
+package tui
 
 import (
 	"fmt"
+	"github.com/sudhanv09/zh/zh_db"
 	"os"
 	"strconv"
 
@@ -15,7 +16,8 @@ var baseStyle = lipgloss.NewStyle().
 	BorderForeground(lipgloss.Color("240"))
 
 type model struct {
-	table table.Model
+	table  table.Model
+	chosen bool
 }
 
 func (m model) Init() tea.Cmd { return nil }
@@ -39,15 +41,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			)
 		}
 	}
+
 	m.table, cmd = m.table.Update(msg)
 	return m, cmd
 }
 
 func (m model) View() string {
-	return baseStyle.Render(m.table.View()) + "\n"
+	var s string
+	s = m.table.View()
+
+	return baseStyle.Render(s) + "\n"
 }
 
-func ui_init() {
+func UiInit() {
+	db := zh_db.DbInit()
 	columns := []table.Column{
 		{Title: "Id", Width: 4},
 		{Title: "Title", Width: 20},
@@ -55,13 +62,11 @@ func ui_init() {
 		{Title: "Created", Width: 20},
 	}
 
-	listArticles, _ := fetchAllArticles()
+	listArticles, _ := db.FetchAllArticles()
 
 	var rows []table.Row
 	for _, item := range listArticles {
-		rows = []table.Row{
-			{strconv.FormatInt(item.ID, 10), item.Title, item.Article, item.TimeCreated},
-		}
+		rows = append(rows, table.Row{strconv.FormatInt(item.ID, 10), item.Title, item.Article, item.TimeCreated})
 	}
 
 	t := table.New(
@@ -83,7 +88,7 @@ func ui_init() {
 		Bold(false)
 	t.SetStyles(s)
 
-	m := model{t}
+	m := model{t, false}
 	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)

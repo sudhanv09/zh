@@ -1,4 +1,4 @@
-package main
+package gen_models
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 
 const gemini = "gemini-pro"
 
-func geminiGen(content string) (*genai.GenerateContentResponse, error) {
+func GeminiGen(content string) (*genai.GenerateContentResponse, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API")))
 	if err != nil {
@@ -32,7 +32,7 @@ func geminiGen(content string) (*genai.GenerateContentResponse, error) {
 	return resp, nil
 }
 
-func retrieveResponse(parts []genai.Part) string {
+func RetrieveResponse(parts []genai.Part) string {
 	var result string
 	for _, part := range parts {
 		result += fmt.Sprint(part)

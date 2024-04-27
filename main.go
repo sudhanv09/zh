@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
-	"github.com/spf13/cobra"
+	"github.com/sudhanv09/zh/gen_models"
+	"github.com/sudhanv09/zh/tui"
+	"github.com/sudhanv09/zh/zh_db"
 	"log"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -15,14 +19,16 @@ func main() {
 		log.Fatal("Failed to load env file")
 	}
 
-	var rootCmd = &cobra.Command{
+	zh_db.SqliteExist()
+
+	rootCmd := &cobra.Command{
 		Use:   "zh",
 		Short: "Learn chinese by reading news articles",
 	}
 
 	var limit int
 	var model string
-	var runCmd = &cobra.Command{
+	runCmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run the scraper and save the results",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -30,11 +36,11 @@ func main() {
 		},
 	}
 
-	var listCmd = &cobra.Command{
+	listCmd := &cobra.Command{
 		Use:   "ls",
 		Short: "List all the articles saved",
 		Run: func(cmd *cobra.Command, args []string) {
-			ui_init()
+			tui.UiInit()
 		},
 	}
 
@@ -49,31 +55,31 @@ func main() {
 }
 
 func app(limit int, model string) {
+	db := zh_db.DbInit()
 	results := scraper(limit)
 
 	for _, article := range results {
 		if model == "gemini" {
-			gemini, err := geminiGen(article.Content)
+			gemini, err := gen_models.GeminiGen(article.Content)
 			if err != nil {
 				log.Fatal("Failed to generate text from gemini")
 			}
 
-			c := retrieveResponse(gemini.Candidates[0].Content.Parts)
-			err = writeToDisk(article.Link, article.Title, article.Content, c)
+			c := gen_models.RetrieveResponse(gemini.Candidates[0].Content.Parts)
+			err = db.WriteToDisk(article.Link, article.Title, article.Content, c)
 			if err != nil {
 				log.Fatal("Write failed")
 			}
 			log.Printf("%s written to disk", article.Link)
 
 		} else {
-			gen := ollamaGen(article)
+			gen := gen_models.OllamaGen(article)
 			time.Sleep(time.Second)
-			err := writeToDisk(article.Link, article.Title, article.Content, gen.Response)
+			err := db.WriteToDisk(article.Link, article.Title, article.Content, gen.Response)
 			if err != nil {
 				log.Fatal("Write failed")
 			}
 			log.Printf("%s written to disk", article.Link)
 		}
-
 	}
 }

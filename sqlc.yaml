@@ -1,8 +1,8 @@
 version: "2"
 sql:
   - engine: "sqlite"
-    queries: "queries.sql"
-    schema: "schema.sql"
+    queries: "zh_db/queries.sql"
+    schema: "zh_db/schema.sql"
     gen:
       go:
         package: "zh_db"

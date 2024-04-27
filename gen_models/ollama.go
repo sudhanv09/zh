@@ -1,9 +1,10 @@
-package main
+package gen_models
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/sudhanv09/zh"
 	"io"
 	"log"
 	"net/http"
@@ -40,7 +41,7 @@ const (
 	basePrompt string = "Translate the text to pinyin."
 )
 
-func ollamaGen(article ScrapedResult) OllamaResponse {
+func OllamaGen(article main.ScrapedResult) OllamaResponse {
 	var ollamaResp OllamaResponse
 	articleContent := strings.ReplaceAll(article.Content, "\t", "")
 	articleContent = strings.ReplaceAll(articleContent, "\n", "")
