@@ -22,6 +22,7 @@ func sqliteExist() bool {
 		}
 		file.Close()
 		log.Println("Sqlite file created")
+		createTable()
 	}
 
 	return true
@@ -63,7 +64,6 @@ func writeToDisk(link string, title string, article string, article_gen string) 
 		TimeCreated: currTime,
 	})
 
-	log.Println("Wrote to disk successfully")
 	return nil
 }
 

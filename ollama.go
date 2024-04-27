@@ -37,10 +37,10 @@ const (
 	Phi    = "phi3:latest"
 
 	ollamaApi  string = "http://localhost:11434/api/generate"
-	basePrompt string = "Translate the text to pinyin. Also teach me 10 words from the text with their english meaning like No. word - meaning."
+	basePrompt string = "Translate the text to pinyin."
 )
 
-func getTranslation(article ScrapedResult) OllamaResponse {
+func ollamaGen(article ScrapedResult) OllamaResponse {
 	var ollamaResp OllamaResponse
 	articleContent := strings.ReplaceAll(article.Content, "\t", "")
 	articleContent = strings.ReplaceAll(articleContent, "\n", "")
