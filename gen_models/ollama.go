@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/sudhanv09/zh"
+	"github.com/sudhanv09/zh/scrapers"
 	"io"
 	"log"
 	"net/http"
@@ -41,7 +41,7 @@ const (
 	basePrompt string = "Translate the text to pinyin."
 )
 
-func OllamaGen(article main.ScrapedResult) OllamaResponse {
+func OllamaGen(article scrapers.ScrapedResult) OllamaResponse {
 	var ollamaResp OllamaResponse
 	articleContent := strings.ReplaceAll(article.Content, "\t", "")
 	articleContent = strings.ReplaceAll(articleContent, "\n", "")

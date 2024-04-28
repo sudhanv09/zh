@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/sudhanv09/zh/gen_models"
+	"github.com/sudhanv09/zh/scrapers"
 	"github.com/sudhanv09/zh/tui"
 	"github.com/sudhanv09/zh/zh_db"
 	"log"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
@@ -56,30 +56,24 @@ func main() {
 
 func app(limit int, model string) {
 	db := zh_db.DbInit()
-	results := scraper(limit)
+	results := scrapers.TVBScraper(limit)
 
 	for _, article := range results {
+		var genString string
 		if model == "gemini" {
 			gemini, err := gen_models.GeminiGen(article.Content)
 			if err != nil {
 				log.Fatal("Failed to generate text from gemini")
 			}
-
-			c := gen_models.RetrieveResponse(gemini.Candidates[0].Content.Parts)
-			err = db.WriteToDisk(article.Link, article.Title, article.Content, c)
-			if err != nil {
-				log.Fatal("Write failed")
-			}
-			log.Printf("%s written to disk", article.Link)
-
+			genString = gen_models.RetrieveResponse(gemini.Candidates[0].Content.Parts)
 		} else {
-			gen := gen_models.OllamaGen(article)
-			time.Sleep(time.Second)
-			err := db.WriteToDisk(article.Link, article.Title, article.Content, gen.Response)
-			if err != nil {
-				log.Fatal("Write failed")
-			}
-			log.Printf("%s written to disk", article.Link)
+			genString = gen_models.OllamaGen(article).Response
 		}
+
+		err := db.WriteToDisk(article.Link, article.Title, article.Content, genString)
+		if err != nil {
+			log.Fatal("Write failed")
+		}
+		log.Printf("%s written to disk", article.Link)
 	}
 }

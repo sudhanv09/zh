@@ -2,27 +2,40 @@ package tui
 
 import (
 	"fmt"
-	"github.com/sudhanv09/zh/zh_db"
-	"os"
-	"strconv"
-
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/reflow/wordwrap"
+	"github.com/sudhanv09/zh/zh_db"
+	"log"
+	"os"
+	"strconv"
 )
 
-var baseStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.NormalBorder()).
-	BorderForeground(lipgloss.Color("240"))
+var (
+	baseStyle = lipgloss.NewStyle().
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color("240")).
+			Align(lipgloss.Center)
+
+	titleStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#710dc5"))
+	dateStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#686968")).PaddingTop(2)
+	//highlight  = lipgloss.NewStyle().Foreground(lipgloss.Color("#11d011"))
+)
+
+const maxWidth = 100
 
 type model struct {
-	table  table.Model
-	chosen bool
+	table   table.Model
+	chosen  bool
+	article zh_db.Zh
+	w, h    int
 }
 
 func (m model) Init() tea.Cmd { return nil }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	db := zh_db.DbInit()
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -36,10 +49,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c":
 			return m, tea.Quit
 		case "enter":
-			return m, tea.Batch(
-				tea.Printf("Let's go to %s!", m.table.SelectedRow()[0]),
-			)
+			id, _ := strconv.ParseInt(m.table.SelectedRow()[0], 10, 64)
+			article, err := db.GetById(id)
+			if err != nil {
+				log.Fatal("Failed to get the article")
+				return m, tea.Quit
+			}
+
+			m.article = article
+			m.chosen = true
 		}
+
+	case tea.WindowSizeMsg:
+		m.w = msg.Width
+		m.h = msg.Height
+
 	}
 
 	m.table, cmd = m.table.Update(msg)
@@ -47,10 +71,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	var s string
-	s = m.table.View()
-
-	return baseStyle.Render(s) + "\n"
+	if m.chosen {
+		s := fmt.Sprintf("%s\n%s\n\n %s\n\n %s",
+			titleStyle.Render(m.article.Title), dateStyle.Render(m.article.TimeCreated), m.article.Article, m.article.ArticleGen)
+		wrap := wordwrap.String(s, min(m.w, maxWidth))
+		return lipgloss.Place(m.w, m.h, lipgloss.Center, lipgloss.Center, wrap)
+	}
+	tbl := baseStyle.Render(m.table.View()) + "\n"
+	return lipgloss.Place(m.w, m.h, lipgloss.Center, lipgloss.Center, tbl)
 }
 
 func UiInit() {
@@ -59,14 +87,18 @@ func UiInit() {
 		{Title: "Id", Width: 4},
 		{Title: "Title", Width: 20},
 		{Title: "Article", Width: 30},
-		{Title: "Created", Width: 20},
+		{Title: "Created", Width: 25},
 	}
 
 	listArticles, _ := db.FetchAllArticles()
 
 	var rows []table.Row
 	for _, item := range listArticles {
-		rows = append(rows, table.Row{strconv.FormatInt(item.ID, 10), item.Title, item.Article, item.TimeCreated})
+		rows = append(rows, table.Row{
+			strconv.FormatInt(item.ID, 10),
+			item.Title,
+			item.Article,
+			item.TimeCreated})
 	}
 
 	t := table.New(
@@ -88,8 +120,8 @@ func UiInit() {
 		Bold(false)
 	t.SetStyles(s)
 
-	m := model{t, false}
-	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
+	m := model{table: t}
+	if _, err := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion()).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}

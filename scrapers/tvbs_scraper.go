@@ -1,9 +1,10 @@
-package main
+package scrapers
 
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly"
+	"strings"
 	"time"
 )
 
@@ -14,7 +15,7 @@ type ScrapedResult struct {
 	Time    time.Time
 }
 
-func scraper(limit int) []ScrapedResult {
+func TVBScraper(limit int) []ScrapedResult {
 	c := colly.NewCollector()
 	articleScraper := c.Clone()
 
@@ -40,11 +41,15 @@ func scraper(limit int) []ScrapedResult {
 		body := el.DOM.Find("div.article_content")
 
 		content := body.Find("p").First().Text()
-		rest := body.Children().Remove().End().Text()
+		contentCleaned := cleanUp(content)
 
+		rest := body.Children().Remove().End().Text()
+		restCleaned := cleanUp(rest)
+
+		final := contentCleaned + restCleaned
 		articles := ScrapedResult{
 			Title:   title,
-			Content: content + rest,
+			Content: final,
 			Link:    el.Request.URL.String(),
 			Time:    time.Now(),
 		}
@@ -63,4 +68,11 @@ func scraper(limit int) []ScrapedResult {
 	c.Visit("https://news.tvbs.com.tw/politics")
 
 	return scrapedArticles
+}
+
+func cleanUp(s string) string {
+	clean := strings.ReplaceAll(s, "\t", " ")
+	clean = strings.ReplaceAll(clean, "\n", " ")
+	clean = strings.ReplaceAll(clean, "\u00a0", "")
+	return clean
 }
