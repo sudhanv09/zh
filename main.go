@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/spf13/cobra"
+
 	"github.com/sudhanv09/zh/gen_models"
 	"github.com/sudhanv09/zh/scrapers"
 	"github.com/sudhanv09/zh/tui"
 	"github.com/sudhanv09/zh/zh_db"
-	"log"
-	"os"
-
-	"github.com/joho/godotenv"
-	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -66,6 +68,7 @@ func app(limit int, model string) {
 				log.Fatal("Failed to generate text from gemini")
 			}
 			genString = gen_models.RetrieveResponse(gemini.Candidates[0].Content.Parts)
+			time.Sleep(time.Minute)
 		} else {
 			genString = gen_models.OllamaGen(article).Response
 		}

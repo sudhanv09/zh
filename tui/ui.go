@@ -2,14 +2,16 @@ package tui
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strconv"
+
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/reflow/wordwrap"
+
 	"github.com/sudhanv09/zh/zh_db"
-	"log"
-	"os"
-	"strconv"
 )
 
 var (
@@ -19,11 +21,11 @@ var (
 			Align(lipgloss.Center)
 
 	titleStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#710dc5"))
-	dateStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#686968")).PaddingTop(2)
-	//highlight  = lipgloss.NewStyle().Foreground(lipgloss.Color("#11d011"))
+	dateStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#686968")).PaddingBottom(2)
+	// highlight  = lipgloss.NewStyle().Foreground(lipgloss.Color("#11d011"))
 )
 
-const maxWidth = 100
+const maxWidth = 120
 
 type model struct {
 	table   table.Model
@@ -63,7 +65,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.w = msg.Width
 		m.h = msg.Height
-
 	}
 
 	m.table, cmd = m.table.Update(msg)
@@ -71,14 +72,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	var renderStr string
 	if m.chosen {
-		s := fmt.Sprintf("%s\n%s\n\n %s\n\n %s",
-			titleStyle.Render(m.article.Title), dateStyle.Render(m.article.TimeCreated), m.article.Article, m.article.ArticleGen)
-		wrap := wordwrap.String(s, min(m.w, maxWidth))
-		return lipgloss.Place(m.w, m.h, lipgloss.Center, lipgloss.Center, wrap)
+		s := fmt.Sprintf("%s\n%s\n\n  %s",
+			titleStyle.Render(m.article.Title), dateStyle.Render(m.article.TimeCreated), m.article.ArticleGen)
+		renderStr = wordwrap.String(s, min(m.w, maxWidth))
+	} else {
+		renderStr = baseStyle.Render(m.table.View()) + "\n"
 	}
-	tbl := baseStyle.Render(m.table.View()) + "\n"
-	return lipgloss.Place(m.w, m.h, lipgloss.Center, lipgloss.Center, tbl)
+	return lipgloss.Place(m.w, m.h, lipgloss.Center, lipgloss.Center, renderStr)
 }
 
 func UiInit() {
@@ -98,7 +100,8 @@ func UiInit() {
 			strconv.FormatInt(item.ID, 10),
 			item.Title,
 			item.Article,
-			item.TimeCreated})
+			item.TimeCreated,
+		})
 	}
 
 	t := table.New(
