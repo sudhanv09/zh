@@ -2,13 +2,13 @@ package tui
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/log"
 	"github.com/muesli/reflow/wordwrap"
 
 	"github.com/sudhanv09/zh/zh_db"
@@ -108,7 +108,7 @@ func UiInit() {
 		table.WithColumns(columns),
 		table.WithRows(rows),
 		table.WithFocused(true),
-		table.WithHeight(7),
+		table.WithHeight(15),
 	)
 
 	s := table.DefaultStyles()

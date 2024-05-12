@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/sudhanv09/zh/scrapers"
 	"io"
-	"log"
 	"net/http"
 	"strings"
+
+	"github.com/charmbracelet/log"
+
+	"github.com/sudhanv09/zh/scrapers"
 )
 
 type OllamaRequest struct {
@@ -65,7 +67,6 @@ func OllamaGen(article scrapers.ScrapedResult) OllamaResponse {
 }
 
 func postReq(body []byte) (io.Reader, error) {
-
 	req, err := http.NewRequest("POST", ollamaApi, bytes.NewBuffer(body))
 	if err != nil {
 		log.Fatal("Couldnt make the POST request ", err)

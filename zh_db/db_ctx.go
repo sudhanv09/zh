@@ -3,10 +3,10 @@ package zh_db
 import (
 	"context"
 	"database/sql"
-	"log"
 	"os"
 	"time"
 
+	"github.com/charmbracelet/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -34,11 +34,9 @@ func SqliteExist() {
 			log.Fatal("Couldnt make the sqlite file", err)
 		}
 		file.Close()
-		log.Println("Sqlite file created")
+		log.Info("Sqlite file created")
 		createTable()
 	}
-
-	return
 }
 
 func createTable() {
@@ -55,7 +53,7 @@ func createTable() {
 		return
 	}
 
-	log.Println("Created table")
+	log.Info("Created table")
 }
 
 func (db *dbSingleTon) WriteToDisk(link string, title string, article string, article_gen string) error {

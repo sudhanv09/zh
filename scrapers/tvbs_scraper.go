@@ -1,11 +1,12 @@
 package scrapers
 
 import (
-	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/gocolly/colly"
 	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/gocolly/colly"
+	"github.com/charmbracelet/log"
 )
 
 type ScrapedResult struct {
@@ -58,11 +59,11 @@ func TVBScraper(limit int) []ScrapedResult {
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL.String())
+		log.Info("Visiting", r.URL.String())
 	})
 
 	articleScraper.OnRequest(func(request *colly.Request) {
-		fmt.Println("Scraping article", request.URL.String())
+		log.Info("Scraping article", request.URL.String())
 	})
 
 	c.Visit("https://news.tvbs.com.tw/politics")

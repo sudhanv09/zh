@@ -3,10 +3,11 @@ package gen_models
 import (
 	"context"
 	"fmt"
+	"os"
+
+	"github.com/charmbracelet/log"
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
-	"log"
-	"os"
 )
 
 const gemini = "gemini-pro"
