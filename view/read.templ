@@ -1,0 +1,56 @@
+package view
+
+import (
+	"github.com/sudhanv09/zh/zh_db"
+)
+
+templ Read(article zh_db.Zh) {
+
+    <style>
+          * {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0;
+  }
+  body {
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100dvh;
+    width: 800px;
+  }
+
+  h1, p {
+    text-align: center;
+  }
+
+  .read {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    text-wrap: wrap;
+    padding: 1rem;
+    margin-top: 10px;
+
+    
+  }
+    </style>
+
+	<main>
+		<h1>
+			{ article.Title }
+		</h1>
+		<p>
+			{ article.TimeCreated }
+		</p>
+		<div class="read">
+			<p>
+				{ article.Article }
+			</p>
+			<p>
+				{ article.ArticleGen }
+			</p>
+		</div>
+	</main>
+}

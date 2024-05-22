@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/a-h/templ"
 	"github.com/charmbracelet/log"
@@ -74,6 +75,12 @@ func server() {
 	index := view.Index(articles)
 
 	http.Handle("/", templ.Handler(index))
+	http.HandleFunc("/read/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id, _ := strconv.ParseInt(r.PathValue("id"), 10, 64)
+		articleId, _ := db.GetById(id)
+		read := view.Read(articleId)
+		read.Render(r.Context(), w)
+	})
 
 	fmt.Println("Starting web server on port 3000")
 	http.ListenAndServe(":3000", nil)
