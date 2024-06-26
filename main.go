@@ -19,11 +19,6 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Failed to load env file")
-	}
-
 	zh_db.SqliteExist()
 
 	rootCmd := &cobra.Command{
@@ -94,6 +89,11 @@ func app(limit int, model string) {
 	for _, article := range results {
 		var genString string
 		if model == "gemini" {
+			err := godotenv.Load()
+			if err != nil {
+				log.Fatal("Gemini API keys not found. Visit https://ai.google.dev/gemini-api/docs/api-key.")
+			}
+
 			gemini, err := gen_models.GeminiGen(article.Content)
 			if err != nil {
 				log.Error("Failed to generate text from gemini")

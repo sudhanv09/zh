@@ -33,11 +33,10 @@ type OllamaResponse struct {
 }
 
 const (
-	Gemma  = "gemma:2b"
 	Wizard = "wizardlm2:7b-q4_K_M"
-	Qwen   = "qwen:7b"
-	Yi     = "yi:6b-chat"
+	Qwen   = "qwen2:latest"
 	Phi    = "phi3:latest"
+	LLama3 = "llama3:latest"
 
 	ollamaApi  string = "http://localhost:11434/api/generate"
 	basePrompt string = "Translate the text to pinyin."
@@ -48,7 +47,7 @@ func OllamaGen(article scrapers.ScrapedResult) OllamaResponse {
 	articleContent := strings.ReplaceAll(article.Content, "\t", "")
 	articleContent = strings.ReplaceAll(articleContent, "\n", "")
 
-	ollamaReq := OllamaRequest{Model: Phi, Prompt: basePrompt + articleContent, Stream: false}
+	ollamaReq := OllamaRequest{Model: LLama3, Prompt: basePrompt + articleContent, Stream: false}
 	reqJson, err := json.Marshal(ollamaReq)
 	if err != nil {
 		log.Fatal("Couldnt Marshal into ollama request", err)
