@@ -107,6 +107,6 @@ func app(limit int, model string) {
 		if err != nil {
 			log.Error("Write failed")
 		}
-		log.Info("%s written to disk", article.Link)
+		log.Info("writing to disk", "url", article.Link)
 	}
 }

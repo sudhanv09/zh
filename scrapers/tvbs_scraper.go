@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gocolly/colly"
 	"github.com/charmbracelet/log"
+	"github.com/gocolly/colly"
 )
 
 type ScrapedResult struct {
@@ -59,11 +59,11 @@ func TVBScraper(limit int) []ScrapedResult {
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		log.Info("Visiting", r.URL.String())
+		log.Info("Visiting", "url", r.URL.String())
 	})
 
 	articleScraper.OnRequest(func(request *colly.Request) {
-		log.Info("Scraping article", request.URL.String())
+		log.Info("Scraping article", "url", request.URL.String())
 	})
 
 	c.Visit("https://news.tvbs.com.tw/politics")
