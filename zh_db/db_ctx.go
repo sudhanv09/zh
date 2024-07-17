@@ -96,3 +96,17 @@ func (db *dbSingleTon) GetById(id int64) (Zh, error) {
 
 	return article, nil
 }
+
+func (db *dbSingleTon) Duplicate(link string) bool {
+	ctx := context.Background()
+	queries := New(db.db)
+	query, err := queries.FindArticle(ctx, link)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if query == "TRUE" {
+		return true
+	}
+	return false
+}

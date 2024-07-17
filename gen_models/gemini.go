@@ -16,7 +16,7 @@ func GeminiGen(content string) (*genai.GenerateContentResponse, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API")))
 	if err != nil {
-		log.Fatal("Failed to init gemini", err)
+		log.Fatal("Gemini API keys not found. Visit https://ai.google.dev/gemini-api/docs/api-key.", err)
 		return nil, err
 	}
 	defer client.Close()

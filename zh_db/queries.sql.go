@@ -32,6 +32,25 @@ func (q *Queries) CreateArticle(ctx context.Context, arg CreateArticleParams) er
 	return err
 }
 
+const findArticle = `-- name: FindArticle :one
+select 
+    case
+        when exists(
+            select id from zh
+            where link = ? limit 1
+        )
+        then 'true'
+        else 'false'
+end as is_present
+`
+
+func (q *Queries) FindArticle(ctx context.Context, link string) (string, error) {
+	row := q.db.QueryRowContext(ctx, findArticle, link)
+	var is_present string
+	err := row.Scan(&is_present)
+	return is_present, err
+}
+
 const getAll = `-- name: GetAll :many
 select id, link, title, article, article_gen, time_created from zh
 `

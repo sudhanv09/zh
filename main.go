@@ -19,6 +19,11 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Warn("No env file found. Can't use gemini without API keys")
+	}
+
 	zh_db.SqliteExist()
 
 	rootCmd := &cobra.Command{
@@ -55,7 +60,7 @@ func main() {
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(serveCmd)
-	runCmd.Flags().IntVarP(&limit, "limit", "l", 5, "Limit the amount of articles scraped.")
+	runCmd.Flags().IntVarP(&limit, "limit", "l", 10, "Limit the amount of articles scraped.")
 	runCmd.Flags().StringVarP(&model, "model", "m", "gemini", "Choose the model to use.")
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -87,13 +92,13 @@ func app(limit int, model string) {
 
 	log.Info("Starting Generation")
 	for _, article := range results {
+		if db.Duplicate(article.Link) {
+			log.Info("Duplicate article found. Skipping...", "link", article.Link)
+			break
+		}
+
 		var genString string
 		if model == "gemini" {
-			err := godotenv.Load()
-			if err != nil {
-				log.Fatal("Gemini API keys not found. Visit https://ai.google.dev/gemini-api/docs/api-key.")
-			}
-
 			gemini, err := gen_models.GeminiGen(article.Content)
 			if err != nil {
 				log.Error("Failed to generate text from gemini")
