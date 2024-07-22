@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/a-h/templ"
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
+	gonanoid "github.com/matoous/go-nanoid"
 	"github.com/spf13/cobra"
 
 	"github.com/sudhanv09/zh/gen_models"
 	"github.com/sudhanv09/zh/scrapers"
-	"github.com/sudhanv09/zh/tui"
 	"github.com/sudhanv09/zh/view"
 	"github.com/sudhanv09/zh/zh_db"
 )
@@ -41,14 +40,6 @@ func main() {
 		},
 	}
 
-	listCmd := &cobra.Command{
-		Use:   "ls",
-		Short: "List all the articles saved",
-		Run: func(cmd *cobra.Command, args []string) {
-			tui.UiInit()
-		},
-	}
-
 	serveCmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Start zh server",
@@ -57,7 +48,6 @@ func main() {
 		},
 	}
 
-	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(serveCmd)
 	runCmd.Flags().IntVarP(&limit, "limit", "l", 10, "Limit the amount of articles scraped.")
@@ -76,7 +66,7 @@ func server() {
 
 	http.Handle("/", templ.Handler(index))
 	http.HandleFunc("/read/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id, _ := strconv.ParseInt(r.PathValue("id"), 10, 64)
+		id := r.PathValue("id")
 		articleId, _ := db.GetById(id)
 		read := view.Read(articleId)
 		read.Render(r.Context(), w)
@@ -108,10 +98,16 @@ func app(limit int, model string) {
 			genString = gen_models.OllamaGen(article).Response
 		}
 
-		err := db.WriteToDisk(article.Link, article.Title, article.Content, genString)
+		id, _ := gonanoid.Generate(
+			"abcdefghijklmniopqrstuvwxyz1234567890",
+			8,
+		)
+
+		err := db.WriteToDisk(id, article.Link, article.Title, article.Content, genString)
 		if err != nil {
-			log.Error("Write failed")
+			log.Error("Write failed", err)
+		} else {
+			log.Info("writing to disk", "url", article.Link)
 		}
-		log.Info("writing to disk", "url", article.Link)
 	}
 }

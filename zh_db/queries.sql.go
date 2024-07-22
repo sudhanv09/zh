@@ -10,10 +10,11 @@ import (
 )
 
 const createArticle = `-- name: CreateArticle :exec
-insert into zh (link, title, article, article_gen, time_created) values ( ?, ?, ?, ?, ?)
+insert into zh (id, link, title, article, article_gen, time_created) values ( ?, ?, ?, ?, ?, ?)
 `
 
 type CreateArticleParams struct {
+	ID          string
 	Link        string
 	Title       string
 	Article     string
@@ -23,6 +24,7 @@ type CreateArticleParams struct {
 
 func (q *Queries) CreateArticle(ctx context.Context, arg CreateArticleParams) error {
 	_, err := q.db.ExecContext(ctx, createArticle,
+		arg.ID,
 		arg.Link,
 		arg.Title,
 		arg.Article,
@@ -90,7 +92,7 @@ select id, link, title, article, article_gen, time_created from zh
 where id = ? limit 1
 `
 
-func (q *Queries) GetById(ctx context.Context, id int64) (Zh, error) {
+func (q *Queries) GetById(ctx context.Context, id string) (Zh, error) {
 	row := q.db.QueryRowContext(ctx, getById, id)
 	var i Zh
 	err := row.Scan(

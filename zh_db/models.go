@@ -5,7 +5,7 @@
 package zh_db
 
 type Zh struct {
-	ID          int64
+	ID          string
 	Link        string
 	Title       string
 	Article     string

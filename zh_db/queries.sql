@@ -6,7 +6,7 @@ select * from zh
 where id = ? limit 1;
 
 -- name: CreateArticle :exec
-insert into zh (link, title, article, article_gen, time_created) values ( ?, ?, ?, ?, ?);
+insert into zh (id, link, title, article, article_gen, time_created) values ( ?, ?, ?, ?, ?, ?);
 
 -- name: FindArticle :one
 select 

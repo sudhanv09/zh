@@ -1,5 +1,5 @@
 create table zh (
-    id integer primary key,
+    id text primary key,
     link text not null,
     title text not null,
     article text not null,

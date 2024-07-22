@@ -3,7 +3,6 @@ package tui
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -51,7 +50,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c":
 			return m, tea.Quit
 		case "enter":
-			id, _ := strconv.ParseInt(m.table.SelectedRow()[0], 10, 64)
+			id := m.table.SelectedRow()[0]
 			article, err := db.GetById(id)
 			if err != nil {
 				log.Fatal("Failed to get the article")
@@ -97,7 +96,7 @@ func UiInit() {
 	var rows []table.Row
 	for _, item := range listArticles {
 		rows = append(rows, table.Row{
-			strconv.FormatInt(item.ID, 10),
+			item.ID,
 			item.Title,
 			item.Article,
 			item.TimeCreated,

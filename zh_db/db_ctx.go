@@ -15,7 +15,7 @@ type dbSingleTon struct {
 }
 
 func DbInit() dbSingleTon {
-	db, err := sql.Open("sqlite3", "zh.db")
+	db, err := sql.Open("sqlite3", "./zh.db")
 	if err != nil {
 		log.Fatal("Failed to open db", err)
 	}
@@ -46,7 +46,7 @@ func createTable() {
 	}
 	defer db.Close()
 
-	createTbl := `create table zh (id integer primary key, link text, title text, article text, article_gen text, time_created text)`
+	createTbl := `create table zh (id text primary key, link text, title text, article text, article_gen text, time_created text)`
 	_, err = db.Exec(createTbl)
 	if err != nil {
 		log.Printf("%q: %s\n", err, createTbl)
@@ -56,12 +56,13 @@ func createTable() {
 	log.Info("Created table")
 }
 
-func (db *dbSingleTon) WriteToDisk(link string, title string, article string, article_gen string) error {
+func (db *dbSingleTon) WriteToDisk(id string, link string, title string, article string, article_gen string) error {
 	ctx := context.Background()
 
 	queries := New(db.db)
 	currTime := time.Now().Format(time.RFC3339)
 	err := queries.CreateArticle(ctx, CreateArticleParams{
+		ID:          id,
 		Link:        link,
 		Title:       title,
 		Article:     article,
@@ -84,7 +85,7 @@ func (db *dbSingleTon) FetchAllArticles() ([]Zh, error) {
 	return articles, nil
 }
 
-func (db *dbSingleTon) GetById(id int64) (Zh, error) {
+func (db *dbSingleTon) GetById(id string) (Zh, error) {
 	ctx := context.Background()
 
 	queries := New(db.db)
