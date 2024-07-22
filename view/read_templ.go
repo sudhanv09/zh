@@ -10,9 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-import (
-	"github.com/sudhanv09/zh/zh_db"
-)
+import "github.com/sudhanv09/zh/zh_db"
 
 func Read(article zh_db.Zh) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
@@ -27,14 +25,14 @@ func Read(article zh_db.Zh) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<style>\n          * {\n    box-sizing: border-box;\n    margin: 0px;\n    padding: 0;\n  }\n  body {\n    margin: auto;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100dvh;\n    width: 800px;\n  }\n\n  h1, p {\n    text-align: center;\n  }\n\n  .read {\n    display: grid;\n    grid-template-columns: repeat(2, 1fr);\n    gap: 5px;\n    text-wrap: wrap;\n    padding: 1rem;\n    margin-top: 10px;\n\n    \n  }\n    </style><main><h1>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<style>\n  * {\n    box-sizing: border-box;\n    margin: 0px;\n    padding: 0;\n  }\n\n  body {\n    margin: auto;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100dvh;\n    width: auto;\n  }\n\n  h1,\n  p {\n    text-align: center;\n  }\n\n  .read {\n    display: grid;\n    grid-template-columns: repeat(2, 1fr);\n    gap: 5px;\n    text-wrap: wrap;\n    padding: 1rem;\n    margin-top: 10px;\n\n\n  }\n</style><main><h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(article.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `read.templ`, Line: 42, Col: 18}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `read.templ`, Line: 40, Col: 18}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -47,7 +45,7 @@ func Read(article zh_db.Zh) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(article.TimeCreated)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `read.templ`, Line: 45, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `read.templ`, Line: 43, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -60,7 +58,7 @@ func Read(article zh_db.Zh) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(article.Article)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `read.templ`, Line: 49, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `read.templ`, Line: 47, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -73,7 +71,7 @@ func Read(article zh_db.Zh) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(article.ArticleGen)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `read.templ`, Line: 52, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `read.templ`, Line: 50, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {

@@ -1,42 +1,40 @@
 package view
 
 import (
-	"github.com/sudhanv09/zh/zh_db"
 	"fmt"
+	"github.com/sudhanv09/zh/zh_db"
 )
 
 templ Index(articles []zh_db.Zh) {
 	<style>
-        * {
-        box-sizing: border-box;
-        margin: 0px;
-        padding: 0;
-        }
-        body {
-            margin:auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100dvh;
-        }
+  * {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0;
+  }
 
-        a {
-            text-decoration: none;
-        }
-        
-    </style>
+  body {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100dvh;
+  }
+
+  a {
+    text-decoration: none;
+  }
+</style>
 	<main>
 		<table>
 			<tr>
-				<th>Id</th>
 				<th>Title</th>
 				<th>Time</th>
 			</tr>
 			for _, article := range articles {
 				<tr>
-					<td>{ fmt.Sprint(article.ID) }</td>
-					<td><a href={ templ.SafeURL(fmt.Sprintf("/read/%d", article.ID)) }>{ article.Title }</a></td>
+					<td><a href={ templ.SafeURL(fmt.Sprintf("/read/%s", article.ID)) }>{ article.Title }</a></td>
 					<td>{ article.TimeCreated }</td>
 				</tr>
 			}

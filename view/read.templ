@@ -1,27 +1,26 @@
 package view
 
-import (
-	"github.com/sudhanv09/zh/zh_db"
-)
+import "github.com/sudhanv09/zh/zh_db"
 
 templ Read(article zh_db.Zh) {
-
-    <style>
-          * {
+	<style>
+  * {
     box-sizing: border-box;
     margin: 0px;
     padding: 0;
   }
+
   body {
     margin: auto;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100dvh;
-    width: 800px;
+    width: auto;
   }
 
-  h1, p {
+  h1,
+  p {
     text-align: center;
   }
 
@@ -33,10 +32,9 @@ templ Read(article zh_db.Zh) {
     padding: 1rem;
     margin-top: 10px;
 
-    
-  }
-    </style>
 
+  }
+</style>
 	<main>
 		<h1>
 			{ article.Title }
