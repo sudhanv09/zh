@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/solid-router'
+
 export const Route = createFileRoute('/')({
   component: IndexComponent,
 })
@@ -12,19 +13,9 @@ function IndexComponent() {
         </p>
         <a
           class="text-[#61dafb] hover:underline"
-          href="https://solidjs.com"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/app/review"
         >
-          Learn Solid
-        </a>
-        <a
-          class="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
+          server func
         </a>
       </header>
     </div>

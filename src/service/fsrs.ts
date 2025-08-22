@@ -1,4 +1,4 @@
-import { fsrs, createEmptyCard, Card } from 'ts-fsrs';
+import { fsrs, createEmptyCard, type Card } from 'ts-fsrs';
 import type { FlashcardData, UserRating } from '../types/flashcard';
 
 /**
