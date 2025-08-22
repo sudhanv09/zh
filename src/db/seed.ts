@@ -1,7 +1,7 @@
 import { db } from "./index";
-import { transformToFlashcard } from "../service/vocabulary-loader";
+import { transformToFlashcard } from "~/service/vocabulary-loader";
 import { flashcards } from "./schema";
-import type { VocabularyItem } from "../types/flashcard";
+import type { VocabularyItem } from "~/types/flashcard";
 import process from "process";
 import path from "path";
 import { promises as fs } from "fs";

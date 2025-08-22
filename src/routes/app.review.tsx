@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
-import { cardsToReview } from "../service/vocabulary-loader";
+import { cardsToReview } from "~/service/vocabulary-loader";
 import { For } from "solid-js";
 
 const getCards = createServerFn({

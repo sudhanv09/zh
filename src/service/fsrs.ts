@@ -1,5 +1,5 @@
 import { fsrs, createEmptyCard, type Card } from 'ts-fsrs';
-import type { FlashcardData, UserRating } from '../types/flashcard';
+import type { FlashcardData, UserRating } from '~/types/flashcard';
 
 /**
  * FSRS engine instance with default parameters

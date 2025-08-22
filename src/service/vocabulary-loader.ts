@@ -2,9 +2,9 @@ import { nanoid } from 'nanoid';
 import { createEmptyCard } from 'ts-fsrs';
 import { eq } from 'drizzle-orm';
 
-import { db } from "../db";
-import { type VocabularyItem, type FlashcardData, DEFAULT_DAILY_GOAL } from "../types/flashcard";
-import { flashcards } from "../db/schema";
+import { db } from "~/db";
+import { flashcards } from "~/db/schema";
+import { type VocabularyItem, type FlashcardData, DEFAULT_DAILY_GOAL } from "~/types/flashcard";
 
 
 export function transformToFlashcard(item: VocabularyItem): FlashcardData {
