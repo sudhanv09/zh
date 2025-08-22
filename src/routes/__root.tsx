@@ -1,20 +1,19 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/solid-router'
-import TanStackQueryProvider from '../integrations/tanstack-query/provider.tsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 
-import Header from '../components/Header'
 
 export const Route = createRootRouteWithContext()({
   component: RootComponent,
 })
 
+const queryClient = new QueryClient()
+
 function RootComponent() {
   return (
     <>
-      <TanStackQueryProvider>
-        <Header />
-
+      <QueryClientProvider client={queryClient}>
         <Outlet />
-      </TanStackQueryProvider>
+      </QueryClientProvider>
     </>
   )
 }
