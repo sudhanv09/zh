@@ -6,3 +6,5 @@ dist-ssr
 .nitro
 .tanstack
 .vscode
+
+zh.db
