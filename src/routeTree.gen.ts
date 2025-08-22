@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppReviewRouteImport } from './routes/app.review'
+import { Route as AppReviewRouteImport } from './routes/app/review'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',

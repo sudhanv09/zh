@@ -1,0 +1,155 @@
+.reviewContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.vocabularyItem {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.pinyin {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.answer {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #eee;
+}
+
+.ratingButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.ratingButton {
+  padding: 15px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ratingButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ratingButton:active {
+  transform: translateY(0);
+}
+
+.ratingButton.again {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.ratingButton.hard {
+  background-color: #f39c12;
+  color: white;
+}
+
+.ratingButton.good {
+  background-color: #27ae60;
+  color: white;
+}
+
+.ratingButton.easy {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.ratingButton.again:hover {
+  background-color: #c0392b;
+}
+
+.ratingButton.hard:hover {
+  background-color: #e67e22;
+}
+
+.ratingButton.good:hover {
+  background-color: #229954;
+}
+
+.ratingButton.easy:hover {
+  background-color: #27ae60;
+}
+
+.controlButtons {
+  display: flex;
+  gap: 15px;
+}
+
+.controlButton {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quitButton {
+  background-color: #34495e;
+  color: white;
+}
+
+.quitButton:hover {
+  background-color: #2c3e50;
+}
+
+.resetButton {
+  background-color: #95a5a6;
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.resetButton:hover {
+  background-color: #7f8c8d;
+}
+
+.userRating {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #ecf0f1;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.hidden {
+  display: none;
+}
