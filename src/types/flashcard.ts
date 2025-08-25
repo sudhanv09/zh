@@ -1,12 +1,12 @@
 import type { Card, ReviewLog, Rating } from 'ts-fsrs';
 
-export enum VocabularySource {
+enum VocabularySource {
   TOCFL = 'tocfl',
   USER = 'user'
 }
 
 export interface VocabularyItem {
-  id: string;
+  id: number;
   vocabulary: string;
   pinyin: string;
   level?: string;
@@ -18,7 +18,7 @@ export interface VocabularyItem {
 
 export interface FlashcardData {
   id: string;
-  vocabularyId: string;
+  vocabularyId: number;
   fsrsCard: Card;
   reviewHistory: ReviewLog[];
   lastReviewed?: Date;
@@ -27,14 +27,22 @@ export interface FlashcardData {
   updatedAt: Date;
 }
 
+export interface FlashcardWithVocabulary extends FlashcardData {
+  vocabulary: VocabularyItem;
+}
+
+export interface VocabularyWithFlashcards extends VocabularyItem {
+  flashcards: FlashcardData[];
+}
 
 // Appl state management
 export interface FlashcardState {
-  currentCard: VocabularyItem | null;
-  deck: FlashcardData[];
+  currentCard: FlashcardWithVocabulary | null;
+  deck: FlashcardWithVocabulary[];
   reviewedToday: number;
   totalCards: number;
 }
 
 export type UserRating = Omit<Rating, "Manual">;
 export const DEFAULT_DAILY_GOAL = 20;
+

@@ -1,5 +1,5 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import { sql, relations } from 'drizzle-orm';
+import { sql, relations, type InferSelectModel } from 'drizzle-orm';
 
 export const vocabulary = sqliteTable('vocabulary', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -33,3 +33,6 @@ export const flashcardRelations = relations(flashcards, ({ one }) => ({
     references: [vocabulary.id],
   }),
 }));
+
+export type VocabTable = InferSelectModel<typeof vocabulary>;
+export type FlashCardTable = InferSelectModel<typeof flashcards>;

@@ -1,44 +1,9 @@
-import { fsrs, createEmptyCard, type Card, type RecordLog, Rating } from 'ts-fsrs';
+import { fsrs, type RecordLog, Rating } from 'ts-fsrs';
 import type { FlashcardData } from '~/types/flashcard';
 
-/**
- * FSRS engine instance with default parameters
- * This provides the core spaced repetition algorithm
- */
 const fsrsEngine = fsrs();
 
-/**
- * Creates a new FSRS card with default state
- * Used when initializing flashcards for the first time
- */
-export function createNewFSRSCard(): Card {
-  return createEmptyCard();
-}
 
-/**
- * Initializes a flashcard with default FSRS state
- * Sets the card as immediately available for review
- */
-export function initializeFlashcard(vocabularyId: string, vocabulary: string, pinyin: string, level: string): FlashcardData {
-  const fsrsCard = createNewFSRSCard();
-  const now = new Date();
-  
-  return {
-    id: vocabularyId,
-    vocabulary,
-    pinyin,
-    level,
-    fsrsCard,
-    reviewHistory: [],
-    lastReviewed: undefined,
-    nextReview: now, // New cards are available immediately
-  };
-}
-
-/**
- * Processes a user's review rating and updates the card's FSRS scheduling
- * Returns the updated flashcard with new scheduling data
- */
 export function processReview(card: FlashcardData, rating: Rating): FlashcardData {
   const now = new Date();
   
@@ -61,16 +26,12 @@ export function processReview(card: FlashcardData, rating: Rating): FlashcardDat
   };
 }
 
-/**
- * Determines if a card is due for review based on current time
- */
+
 export function isCardDue(card: FlashcardData, currentTime: Date = new Date()): boolean {
   return card.nextReview <= currentTime;
 }
 
-/**
- * Filters cards to only those that are due for review
- */
+
 export function getDueCards(cards: FlashcardData[], currentTime: Date = new Date()): FlashcardData[] {
   return cards.filter(card => isCardDue(card, currentTime));
 }
@@ -105,10 +66,7 @@ export function sortCardsByPriority(cards: FlashcardData[], currentTime: Date = 
   });
 }
 
-/**
- * Selects the next card to review from a deck
- * Returns the highest priority due card, or null if no cards are due
- */
+
 export function selectNextCard(cards: FlashcardData[], currentTime: Date = new Date()): FlashcardData | null {
   const dueCards = getDueCards(cards, currentTime);
   
@@ -120,9 +78,7 @@ export function selectNextCard(cards: FlashcardData[], currentTime: Date = new D
   return sortedCards[0];
 }
 
-/**
- * Gets statistics about the current deck state
- */
+
 export function getDeckStats(cards: FlashcardData[], currentTime: Date = new Date()) {
   const dueCards = getDueCards(cards, currentTime);
   const newCards = cards.filter(card => card.reviewHistory.length === 0);
@@ -137,10 +93,7 @@ export function getDeckStats(cards: FlashcardData[], currentTime: Date = new Dat
   };
 }
 
-/**
- * Calculates the next review interval for a given rating without updating the card
- * Useful for showing users what would happen with different ratings
- */
+
 export function previewNextInterval(card: FlashcardData, rating: Rating): { interval: number; nextReview: Date } {
   const now = new Date();
   const schedulingCards = fsrsEngine.repeat(card.fsrsCard, now);
