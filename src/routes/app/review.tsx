@@ -1,9 +1,11 @@
-import { createFileRoute } from "@tanstack/solid-router";
+import { createFileRoute, useNavigate } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import { cardsToReview, updateFlashcard } from "~/service/vocabulary-loader";
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import reviewpagecss from "./review.css?url";
-import type { UserRating } from "~/types/flashcard";
+import { Rating } from "ts-fsrs";
+import { processReview } from "~/service/fsrs";
+import type { FlashcardData } from "~/types/flashcard";
 
 const getCards = createServerFn({
   method: "GET",
@@ -11,11 +13,11 @@ const getCards = createServerFn({
   return cardsToReview();
 });
 
-const updateCard = createServerFn({
-  method: "POST",
-}).handler(() => {
-  return cardsToReview();
-});
+const updateProgress = createServerFn()
+  .validator((c: FlashcardData) => c)
+  .handler(async (ctx) => {
+    return await updateFlashcard(ctx.data);
+  });
 
 export const Route = createFileRoute("/app/review")({
   head: () => ({
@@ -27,75 +29,83 @@ export const Route = createFileRoute("/app/review")({
 
 function Home() {
   const state = Route.useLoaderData();
+  const navigate = useNavigate();
   const [count, setCount] = createSignal(0);
   const [showAnswer, setShowAnswer] = createSignal(false);
-  const [userRating, setUserRating] = createSignal<UserRating | null>(null);
+
+  const currentCard = () => state()?.[count()];
+  const progress = state()
+    ? Math.round(((count() + 1) / state().length) * 100)
+    : 0;
 
   const nextVal = () => {
     setCount((prev) => (prev === state.length - 1 ? 0 : prev + 1));
     setShowAnswer(false);
-    setUserRating(null);
   };
 
-  const handleRating = (rating: UserRating) => {
-    setUserRating(rating);
+  const handleRating = (rating: Rating) => {
+    const updatedCard = processReview(currentCard(), rating);
+    updateProgress({ data: updatedCard });
+
     setShowAnswer(true);
+    setTimeout(nextVal, 1500);
   };
-
-  const handleQuit = () => {
-    window.location.href = "/";
-  };
-
-  const currentCard = state()?.[count()];
 
   return (
     <div class="reviewContainer">
-      <div class="card">
-        <div class="vocabularyItem">{currentCard?.vocabulary}</div>
-        <div class="pinyin">{currentCard?.pinyin}</div>
+      <div class="progressBar">
+        <div class="progressFill" style={{ width: `${progress}%` }}></div>
+      </div>
 
-        {showAnswer() && (
-          <div class="answer">Answer: {currentCard?.vocabulary}</div>
-        )}
+      <div class="progressText">
+        <span class="currentCard">{count() + 1}</span> /{" "}
+        <span class="totalCards">{state()?.length || 0}</span> cards
+      </div>
 
-        {userRating() && (
-          <div class="userRating">Your rating: {userRating()}</div>
-        )}
+      <div class="reviewCard">
+        <div class="cardHeader">
+          <div class="characterDisplay">{currentCard()?.vocabulary}</div>
+        </div>
+
+        <Show when={showAnswer()}>
+          <p>{currentCard()?.pinyin}</p>
+        </Show>
       </div>
 
       <div class="ratingButtons">
         <button
-          class={"ratingButton again"}
-          onClick={() => handleRating("again" as unknown as UserRating)}
+          class="ratingButton again"
+          onClick={() => handleRating(Rating.Again)}
+          disabled={showAnswer()}
         >
           Again
         </button>
         <button
-          class={"ratingButton hard"}
-          onClick={() => handleRating("hard" as unknown as UserRating)}
+          class="ratingButton hard"
+          onClick={() => handleRating(Rating.Hard)}
+          disabled={showAnswer()}
         >
           Hard
         </button>
         <button
-          class={"ratingButton good"}
-          onClick={() => handleRating("good" as unknown as UserRating)}
+          class="ratingButton good"
+          onClick={() => handleRating(Rating.Good)}
+          disabled={showAnswer()}
         >
           Good
         </button>
         <button
-          class={"ratingButton easy"}
-          onClick={() => handleRating("easy" as unknown as UserRating)}
+          class="ratingButton easy"
+          onClick={() => handleRating(Rating.Easy)}
+          disabled={showAnswer()}
         >
           Easy
         </button>
       </div>
 
       <div class="controlButtons">
-        <button class="quitButton" onClick={handleQuit}>
-          Quit
-        </button>
-        <button class="resetButton" disabled>
-          Reset
+        <button class="quitButton" onClick={() => navigate({ to: "/" })}>
+          Quit to Home
         </button>
       </div>
     </div>
