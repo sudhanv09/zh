@@ -8,6 +8,13 @@
       "when": 1755664969607,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1756105202560,
+      "tag": "0001_separate vocab and reviews",
+      "breakpoints": true
     }
   ]
 }

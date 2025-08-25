@@ -1,7 +1,6 @@
 import { db } from "./index";
-import { transformToFlashcard } from "~/service/vocabulary-loader";
-import { flashcards } from "./schema";
-import type { VocabularyItem } from "~/types/flashcard";
+import { vocabulary } from "./schema";
+import { VocabularySource, type VocabularyItem } from "~/types/flashcard";
 import process from "process";
 import path from "path";
 import { promises as fs } from "fs";
@@ -18,19 +17,26 @@ async function getVocabularyData(): Promise<VocabularyItem[]> {
 export async function seedDatabase() {
     try {
         const vocabularyData = await getVocabularyData();
-        const flashcardsData = vocabularyData.map(transformToFlashcard);
+        const ts = Math.floor(Date.now() / 1000)
 
-        const dbFlashcards = flashcardsData.map(card => ({
-            ...card,
-            lastReviewed: card.lastReviewed ? Math.floor(card.lastReviewed.getTime() / 1000) : null,
-            nextReview: Math.floor(card.nextReview.getTime() / 1000),
-        }));
 
-        const batchSize = 200;
-        for (let i = 0; i < dbFlashcards.length; i += batchSize) {
-            const batch = dbFlashcards.slice(i, i + batchSize);
-            await db.insert(flashcards).values(batch);
+        const BATCH_SIZE = 200;
+        for (let i = 0; i < vocabularyData.length; i += BATCH_SIZE) {
+            const batch = vocabularyData.slice(i, i + BATCH_SIZE);
+
+            await db.insert(vocabulary).values(
+                batch.map(item => ({
+                    vocabulary: item.vocabulary,
+                    pinyin: item.pinyin,
+                    level: item.level,
+                    source: VocabularySource.TOCFL,
+                    definition: item.definition ?? "",
+                    examples: item.examples ?? "",
+                    createdAt: ts,
+                }))
+            );
         }
+        
 
         console.log("Database seeded successfully!");
     } catch (error) {
