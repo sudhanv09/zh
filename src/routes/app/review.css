@@ -9,21 +9,109 @@
   color: #333;
 }
 
-.progressBar {
-  width: 100%;
-  max-width: 400px;
-  height: 8px;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  margin-bottom: 10px;
-  overflow: hidden;
+.completionMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  z-index: 1000;
+  animation: slideInScale 0.5s ease-out;
 }
 
-.progressFill {
-  height: 100%;
-  background: linear-gradient(90deg, #4ade80, #22c55e);
-  border-radius: 4px;
-  transition: width 0.3s ease;
+.checkmark {
+  margin-bottom: 15px;
+}
+
+.checkmark-icon {
+  width: 60px;
+  height: 60px;
+  animation: checkmarkDraw 0.8s ease-in-out;
+}
+
+.checkmark-circle {
+  stroke: white;
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-linecap: round;
+  animation: circleStroke 0.6s ease-in-out forwards;
+}
+
+.checkmark-check {
+  stroke: white;
+  stroke-width: 4;
+  fill: none;
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+  stroke-linecap: round;
+  animation: checkDraw 0.6s ease-in-out 0.3s forwards;
+}
+
+.completionText {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.ratingChips {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.chip.again {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.chip.hard {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.chip.good {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+
+.chip.easy {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.chipLabel {
+  opacity: 0.9;
+}
+
+.chipValue {
+  font-weight: bold;
+  font-size: 1rem;
 }
 
 .progressText {
@@ -267,5 +355,62 @@
   .quitButton {
     padding: 12px 24px;
     font-size: 1rem;
+  }
+  
+  .ratingChips {
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .chip {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .chipValue {
+    font-size: 0.9rem;
+  }
+  
+  .completionMessage {
+    padding: 20px 30px;
+    margin: 20px;
+  }
+  
+  .completionText {
+    font-size: 1.2rem;
+  }
+  
+  .checkmark-icon {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@keyframes slideInScale {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes circleStroke {
+  0% {
+    stroke-dashoffset: 166;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes checkDraw {
+  0% {
+    stroke-dashoffset: 50;
+  }
+  100% {
+    stroke-dashoffset: 0;
   }
 }

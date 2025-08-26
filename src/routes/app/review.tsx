@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import { cardsToReview, updateFlashcard } from "~/service/vocabulary-loader";
-import { createSignal, Show } from "solid-js";
+import { createSignal, Show, onMount } from "solid-js";
 import reviewpagecss from "./review.css?url";
 import { Rating } from "ts-fsrs";
 import { processReview } from "~/service/fsrs";
@@ -32,6 +32,13 @@ function Home() {
   const navigate = useNavigate();
   const [count, setCount] = createSignal(0);
   const [showAnswer, setShowAnswer] = createSignal(false);
+  const [ratings, setRatings] = createSignal({
+    easy: 0 as number,
+    hard: 0 as number,
+    good: 0 as number,
+    again: 0 as number
+  });
+  const [isCompleted, setIsCompleted] = createSignal(false);
 
   const currentCard = () => state()?.[count()];
   const progress = state()
@@ -39,13 +46,41 @@ function Home() {
     : 0;
 
   const nextVal = () => {
-    setCount((prev) => (prev === state.length - 1 ? 0 : prev + 1));
+    const newCount = count() === state().length - 1 ? 0 : count() + 1;
+    setCount(newCount);
     setShowAnswer(false);
+    
+    // Check if all cards have been reviewed
+    if (newCount === 0 && Object.values(ratings()).some(rating => rating > 0)) {
+      setIsCompleted(true);
+      setTimeout(() => setIsCompleted(false), 3000); // Hide completion message after 3 seconds
+    }
   };
 
   const handleRating = (rating: Rating) => {
     const updatedCard = processReview(currentCard(), rating);
     updateProgress({ data: updatedCard });
+
+    // Update ratings count
+    let ratingKey: 'easy' | 'hard' | 'good' | 'again';
+    switch (rating) {
+      case Rating.Again:
+        ratingKey = 'again';
+        break;
+      case Rating.Hard:
+        ratingKey = 'hard';
+        break;
+      case Rating.Good:
+        ratingKey = 'good';
+        break;
+      case Rating.Easy:
+        ratingKey = 'easy';
+        break;
+    }
+    setRatings(prev => ({
+      ...prev,
+      [ratingKey]: prev[ratingKey] + 1
+    }));
 
     setShowAnswer(true);
     setTimeout(nextVal, 1500);
@@ -53,8 +88,35 @@ function Home() {
 
   return (
     <div class="reviewContainer">
-      <div class="progressBar">
-        <div class="progressFill" style={{ width: `${progress}%` }}></div>
+      <Show when={isCompleted()}>
+        <div class="completionMessage">
+          <div class="checkmark">
+            <svg class="checkmark-icon" viewBox="0 0 52 52">
+              <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+              <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
+          </div>
+          <div class="completionText">Review Complete! 🎉</div>
+        </div>
+      </Show>
+
+      <div class="ratingChips">
+        <div class="chip again">
+          <span class="chipLabel">Again:</span>
+          <span class="chipValue">{ratings().again}</span>
+        </div>
+        <div class="chip hard">
+          <span class="chipLabel">Hard:</span>
+          <span class="chipValue">{ratings().hard}</span>
+        </div>
+        <div class="chip good">
+          <span class="chipLabel">Good:</span>
+          <span class="chipValue">{ratings().good}</span>
+        </div>
+        <div class="chip easy">
+          <span class="chipLabel">Easy:</span>
+          <span class="chipValue">{ratings().easy}</span>
+        </div>
       </div>
 
       <div class="progressText">
