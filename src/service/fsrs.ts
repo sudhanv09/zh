@@ -1,5 +1,5 @@
-import { fsrs, createEmptyCard, type Card, type RecordLog, Rating } from 'ts-fsrs';
-import type { FlashcardData } from '~/types/flashcard';
+import { fsrs, createEmptyCard, type Card, type RecordLog } from 'ts-fsrs';
+import type { FlashcardData, UserRating } from '~/types/flashcard';
 
 /**
  * FSRS engine instance with default parameters
@@ -39,7 +39,7 @@ export function initializeFlashcard(vocabularyId: string, vocabulary: string, pi
  * Processes a user's review rating and updates the card's FSRS scheduling
  * Returns the updated flashcard with new scheduling data
  */
-export function processReview(card: FlashcardData, rating: Rating): FlashcardData {
+export function processReview(card: FlashcardData, rating: UserRating): FlashcardData {
   const now = new Date();
   
   const schedulingCards: RecordLog = fsrsEngine.repeat(card.fsrsCard, now);
@@ -141,7 +141,7 @@ export function getDeckStats(cards: FlashcardData[], currentTime: Date = new Dat
  * Calculates the next review interval for a given rating without updating the card
  * Useful for showing users what would happen with different ratings
  */
-export function previewNextInterval(card: FlashcardData, rating: Rating): { interval: number; nextReview: Date } {
+export function previewNextInterval(card: FlashcardData, rating: UserRating): { interval: number; nextReview: Date } {
   const now = new Date();
   const schedulingCards = fsrsEngine.repeat(card.fsrsCard, now);
   

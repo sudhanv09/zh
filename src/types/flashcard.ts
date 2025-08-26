@@ -22,15 +22,5 @@ export interface FlashcardState {
   totalCards: number;
 }
 
-export type UserRating = Rating;
-
+export type UserRating = Omit<Rating, "Manual">;
 export const DEFAULT_DAILY_GOAL = 20;
-export const AVAILABLE_LEVELS = [
-  'Novice 1',
-  'Novice 2', 
-  'Level 1',
-  'Level 2',
-  'Level 3',
-  'Level 4',
-  'Level 5'
-];
