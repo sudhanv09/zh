@@ -6,5 +6,7 @@ dist-ssr
 .nitro
 .tanstack
 .vscode
+.output
+.kiro
 
 zh.db
