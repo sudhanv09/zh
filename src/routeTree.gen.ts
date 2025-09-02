@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppReviewRouteImport } from './routes/app/review'
-import { Route as AppProgressRouteImport } from './routes/app/progress'
+import { Route as AppDictRouteImport } from './routes/app/dict'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,39 +23,39 @@ const AppReviewRoute = AppReviewRouteImport.update({
   path: '/app/review',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppProgressRoute = AppProgressRouteImport.update({
-  id: '/app/progress',
-  path: '/app/progress',
+const AppDictRoute = AppDictRouteImport.update({
+  id: '/app/dict',
+  path: '/app/dict',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app/progress': typeof AppProgressRoute
+  '/app/dict': typeof AppDictRoute
   '/app/review': typeof AppReviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app/progress': typeof AppProgressRoute
+  '/app/dict': typeof AppDictRoute
   '/app/review': typeof AppReviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app/progress': typeof AppProgressRoute
+  '/app/dict': typeof AppDictRoute
   '/app/review': typeof AppReviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app/progress' | '/app/review'
+  fullPaths: '/' | '/app/dict' | '/app/review'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app/progress' | '/app/review'
-  id: '__root__' | '/' | '/app/progress' | '/app/review'
+  to: '/' | '/app/dict' | '/app/review'
+  id: '__root__' | '/' | '/app/dict' | '/app/review'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppProgressRoute: typeof AppProgressRoute
+  AppDictRoute: typeof AppDictRoute
   AppReviewRoute: typeof AppReviewRoute
 }
 
@@ -75,11 +75,11 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof AppReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/progress': {
-      id: '/app/progress'
-      path: '/app/progress'
-      fullPath: '/app/progress'
-      preLoaderRoute: typeof AppProgressRouteImport
+    '/app/dict': {
+      id: '/app/dict'
+      path: '/app/dict'
+      fullPath: '/app/dict'
+      preLoaderRoute: typeof AppDictRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -87,7 +87,7 @@ declare module '@tanstack/solid-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppProgressRoute: AppProgressRoute,
+  AppDictRoute: AppDictRoute,
   AppReviewRoute: AppReviewRoute,
 }
 export const routeTree = rootRouteImport
