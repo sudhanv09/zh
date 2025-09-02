@@ -22,33 +22,38 @@ export class DictionaryService {
   async loadDictionary(): Promise<void> {
     const dictFile = await fs.readFile(this.dictionaryPath, 'utf-8');
     this.entries = this.parseDict(dictFile.split('\n'));
-    console.log(this.entries.length)
   }
 
   parseDict(lines: string[]): CCDict[] {
-    console.log(lines.length)
     const dict: CCDict[] = [];
+    const lineRegex = /^(\S+)\s+(\S+)\s+\[([^\]]+)\]\s+\/(.+)\/$/;
 
     for (const line of lines) {
-      // skip comments
-      if (line.startsWith('#') || line.trim() === "") {
+      const trimmedLine = line.trim();
+
+      if (trimmedLine.startsWith('#') || trimmedLine === '') {
         continue;
       }
 
-     const match = line.match(/^(\S+)\s+(\S+)\s+\[(.+?)\]\s+\/(.+)\/$/);
-      if (!match) continue;
+      const match = trimmedLine.match(lineRegex);
 
-      const [, traditional, simplified, pinyin, rest] = match;
-
-      const firstSlash = rest.indexOf('/');
-      const lastSlash = rest.lastIndexOf('/');
-      let defs: string[] = [];
-      if (firstSlash !== -1 && lastSlash !== -1 && lastSlash > firstSlash) {
-        const inner = rest.slice(firstSlash + 1, lastSlash);
-        defs = inner.split('/').filter(Boolean).map(s => s.trim());
+      if (!match) {
+        continue;
       }
 
-      dict.push({ traditional: traditional, simplified: simplified, pinyin: pinyin, definition: defs })
+      const [, traditional, simplified, pinyin, definitions] = match;
+
+      const defs = definitions
+        .split('/')
+        .filter(def => def.trim() !== '')
+        .map(def => def.trim());
+
+      dict.push({
+        traditional,
+        simplified,
+        pinyin,
+        definition: defs,
+      });
     }
 
     return dict;
@@ -57,17 +62,20 @@ export class DictionaryService {
   async searchDictionary(query: string): Promise<DictionarySearchResult> {
     const start = Date.now();
     if (this.entries.length === 0) throw new Error('Dictionary not loaded');
-    if (!query.trim()) return { entries: [], totalCount: 0, searchTime: 0, query };
+    if (!query || !query.trim()) return { entries: [], totalCount: 0, searchTime: 0, query: '' };
 
     let results: CCDict[] = [];
-    if (/ [\u4e00 - \u9fff] /.test(query)) {
+
+    if (/[\u4e00-\u9fff]/.test(query)) {
       results = this.entries.filter(
         e => e.simplified.includes(query) || e.traditional.includes(query)
       );
-    } else if (/[a-zA-Z]/.test(query)) {
+    } else {
       const q = query.toLowerCase();
       results = this.entries.filter(
-        e => e.definition.some(def => def.toLowerCase().includes(q))
+        e => e.simplified.toLowerCase().includes(q) ||
+          e.traditional.toLowerCase().includes(q) ||
+          e.definition.some(def => def.toLowerCase().includes(q))
       );
     }
 
