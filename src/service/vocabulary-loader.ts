@@ -20,7 +20,7 @@ export function transformToFlashcard(item: VocabularyItem): FlashcardData {
         fsrsCard,
         reviewHistory: [],
         lastReviewed: undefined,
-        nextReview: now, // New cards are available immediately
+        nextReview: now,
     };
 }
 
@@ -38,10 +38,7 @@ export async function getAllFlashcards(): Promise<FlashcardData[]> {
   }));
 }
 
-/**
- * Server function for loading vocabulary data as flashcards
- * Transforms vocabulary items into flashcard format with FSRS data
- */
+
 export async function cardsToReview(): Promise<FlashcardData[]> {
     "use server";
     try {
@@ -63,10 +60,6 @@ export async function cardsToReview(): Promise<FlashcardData[]> {
     }
 }
 
-/**
- * Server function for updating a flashcard in the database
- * @param updatedCard The updated flashcard data
- */
 export async function updateFlashcard(updatedCard: FlashcardData): Promise<void> {
     "use server";
 
@@ -86,9 +79,6 @@ export async function updateFlashcard(updatedCard: FlashcardData): Promise<void>
     }
 }
 
-/**
- * Client-side utility for getting vocabulary statistics
- */
 export function getVocabularyStats(vocabulary: VocabularyItem[]) {
     const totalWords = vocabulary.length;
     const levelCounts: Record<string, number> = {};
