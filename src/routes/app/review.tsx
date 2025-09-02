@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/solid-router";
 import { createServerFn } from "@tanstack/solid-start";
 import { cardsToReview, updateFlashcard } from "~/service/vocabulary-loader";
-import { createSignal, Show, onMount } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import reviewpagecss from "./review.css?url";
 import { Rating } from "ts-fsrs";
 import { processReview } from "~/service/fsrs";
 import type { FlashcardData } from "~/types/flashcard";
+import ProgressBar from "~/components/ProgressBar";
 
 const getCards = createServerFn({
   method: "GET",
@@ -33,10 +34,10 @@ function Home() {
   const [count, setCount] = createSignal(0);
   const [showAnswer, setShowAnswer] = createSignal(false);
   const [ratings, setRatings] = createSignal({
-    easy: 0 as number,
-    hard: 0 as number,
-    good: 0 as number,
-    again: 0 as number
+    easy: 0,
+    hard: 0,
+    good: 0,
+    again: 0
   });
   const [isCompleted, setIsCompleted] = createSignal(false);
 
@@ -119,10 +120,11 @@ function Home() {
         </div>
       </div>
 
-      <div class="progressText">
-        <span class="currentCard">{count() + 1}</span> /{" "}
-        <span class="totalCards">{state()?.length || 0}</span> cards
-      </div>
+      <ProgressBar
+        progress={progress}
+        current={count() + 1}
+        total={state()?.length || 0}
+      />
 
       <div class="reviewCard">
         <div class="cardHeader">
