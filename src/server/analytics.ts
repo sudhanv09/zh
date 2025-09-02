@@ -10,7 +10,6 @@ export const getDashboardMetrics = createServerFn({
         return await analyticsService.getDashboardMetrics();
     } catch (error) {
         console.error('Failed to get dashboard metrics:', error);
-        // Return fallback data to ensure UI doesn't break
         return {
             cardsStudiedToday: 0,
             accuracyRate: 0,
@@ -32,7 +31,6 @@ export const getWeeklyProgress = createServerFn({
         return await analyticsService.getWeeklyProgress();
     } catch (error) {
         console.error('Failed to get weekly progress:', error);
-        // Return fallback data to ensure chart doesn't break
         return {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             datasets: [{

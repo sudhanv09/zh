@@ -1,6 +1,7 @@
 import { db } from '~/db';
 import { flashcards } from '~/db/schema';
-import type { ReviewLog } from 'ts-fsrs';
+import { eq } from 'drizzle-orm';
+import type { Card, ReviewLog } from 'ts-fsrs';
 
 export interface DashboardMetrics {
   cardsStudiedToday: number;
@@ -42,19 +43,7 @@ export interface ActivityItem {
 }
 
 class AnalyticsService {
-  private metricsCache: { data: DashboardMetrics; timestamp: number } | null = null;
-  private weeklyCache: { data: WeeklyProgressData; timestamp: number } | null = null;
-  private categoryCache: { data: CategoryData; timestamp: number } | null = null;
-  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-  private isCacheValid(cache: { timestamp: number } | null): boolean {
-    return cache !== null && Date.now() - cache.timestamp < this.CACHE_TTL;
-  }
-
   async getDashboardMetrics(): Promise<DashboardMetrics> {
-    if (this.isCacheValid(this.metricsCache)) {
-      return this.metricsCache!.data;
-    }
 
     try {
       const today = new Date();
@@ -65,8 +54,8 @@ class AnalyticsService {
       yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayTimestamp = Math.floor(yesterday.getTime() / 1000);
 
-      // Get all flashcards with their review history
-      const allCards = await db.select().from(flashcards);
+      // Get novice 1 cards first for better performance
+      const noviceCards = await db.select().from(flashcards).where(eq(flashcards.level, 'Novice 1')).limit(10);
       
       let cardsStudiedToday = 0;
       let cardsStudiedYesterday = 0;
@@ -76,24 +65,56 @@ class AnalyticsService {
       let correctReviewsYesterday = 0;
       let studyTimeToday = 0;
 
-      for (const card of allCards) {
+      for (const card of noviceCards) {
+        const fsrsData = JSON.parse(card.fsrsCard as string) as Card;
         const reviewHistory = card.reviewHistory as ReviewLog[];
         
-        for (const review of reviewHistory) {
-          const reviewTimestamp = Math.floor(new Date(review.review).getTime() / 1000);
+        // Check if card was reviewed today using last_review from FSRS data
+        if (fsrsData.last_review) {
+          const lastReviewTimestamp = Math.floor(new Date(fsrsData.last_review).getTime() / 1000);
           
-          if (reviewTimestamp >= todayTimestamp) {
+          if (lastReviewTimestamp >= todayTimestamp) {
             cardsStudiedToday++;
             totalReviewsToday++;
             studyTimeToday += 30; // Assume 30 seconds per review
-            if (review.rating >= 3) { // Rating 3 or 4 is considered correct
+            // Assume successful review if reps > 0 (card has been studied)
+            if (fsrsData.reps > 0) {
               correctReviewsToday++;
             }
-          } else if (reviewTimestamp >= yesterdayTimestamp) {
+          } else if (lastReviewTimestamp >= yesterdayTimestamp) {
             cardsStudiedYesterday++;
             totalReviewsYesterday++;
-            if (review.rating >= 3) {
+            if (fsrsData.reps > 0) {
               correctReviewsYesterday++;
+            }
+          }
+        } else {
+          // console.log("here")
+        }
+        
+        // Also check review history if it exists
+        if (reviewHistory && Array.isArray(reviewHistory)) {
+          for (const review of reviewHistory) {
+            const reviewTimestamp = Math.floor(new Date(review.review).getTime() / 1000);
+            
+            if (reviewTimestamp >= todayTimestamp) {
+              // Don't double count if already counted from FSRS data
+              if (!fsrsData?.last_review || Math.floor(new Date(fsrsData.last_review).getTime() / 1000) < todayTimestamp) {
+                cardsStudiedToday++;
+                totalReviewsToday++;
+                studyTimeToday += 30;
+                if (review.rating >= 3) {
+                  correctReviewsToday++;
+                }
+              }
+            } else if (reviewTimestamp >= yesterdayTimestamp) {
+              if (!fsrsData?.last_review || Math.floor(new Date(fsrsData.last_review).getTime() / 1000) < yesterdayTimestamp) {
+                cardsStudiedYesterday++;
+                totalReviewsYesterday++;
+                if (review.rating >= 3) {
+                  correctReviewsYesterday++;
+                }
+              }
             }
           }
         }
@@ -113,7 +134,7 @@ class AnalyticsService {
       const metrics: DashboardMetrics = {
         cardsStudiedToday,
         accuracyRate: Math.round(accuracyRate),
-        totalCards: allCards.length,
+        totalCards: noviceCards.length,
         studyTimeToday: `${Math.round(studyTimeToday / 60)}m`,
         weeklyChange: {
           cardsStudied: `${cardsChange.startsWith('-') ? '' : '+'}${cardsChange}%`,
@@ -121,7 +142,6 @@ class AnalyticsService {
         },
       };
 
-      this.metricsCache = { data: metrics, timestamp: Date.now() };
       return metrics;
     } catch (error) {
       console.error('Error calculating dashboard metrics:', error);
@@ -140,9 +160,6 @@ class AnalyticsService {
   }
 
   async getWeeklyProgress(): Promise<WeeklyProgressData> {
-    if (this.isCacheValid(this.weeklyCache)) {
-      return this.weeklyCache!.data;
-    }
 
     try {
       const today = new Date();
@@ -164,11 +181,26 @@ class AnalyticsService {
         let cardsStudiedThisDay = 0;
 
         for (const card of allCards) {
+          const fsrsData = card.fsrsCard as any;
           const reviewHistory = card.reviewHistory as ReviewLog[];
-          for (const review of reviewHistory) {
-            const reviewTimestamp = Math.floor(new Date(review.review).getTime() / 1000);
-            if (reviewTimestamp >= dayStart && reviewTimestamp < dayEnd) {
+          
+          // Check FSRS last_review
+          if (fsrsData?.last_review) {
+            const lastReviewTimestamp = Math.floor(new Date(fsrsData.last_review).getTime() / 1000);
+            if (lastReviewTimestamp >= dayStart && lastReviewTimestamp < dayEnd) {
               cardsStudiedThisDay++;
+              continue; // Skip review history to avoid double counting
+            }
+          }
+          
+          // Check review history if no FSRS data or FSRS data doesn't match this day
+          if (reviewHistory && Array.isArray(reviewHistory)) {
+            for (const review of reviewHistory) {
+              const reviewTimestamp = Math.floor(new Date(review.review).getTime() / 1000);
+              if (reviewTimestamp >= dayStart && reviewTimestamp < dayEnd) {
+                cardsStudiedThisDay++;
+                break; // Only count once per day per card
+              }
             }
           }
         }
@@ -186,7 +218,6 @@ class AnalyticsService {
         }]
       };
 
-      this.weeklyCache = { data: progressData, timestamp: Date.now() };
       return progressData;
     } catch (error) {
       console.error('Error calculating weekly progress:', error);
@@ -204,9 +235,6 @@ class AnalyticsService {
   }
 
   async getCategoryDistribution(): Promise<CategoryData> {
-    if (this.isCacheValid(this.categoryCache)) {
-      return this.categoryCache!.data;
-    }
 
     try {
       const allCards = await db.select().from(flashcards);
@@ -241,7 +269,6 @@ class AnalyticsService {
         }]
       };
 
-      this.categoryCache = { data: categoryData, timestamp: Date.now() };
       return categoryData;
     } catch (error) {
       console.error('Error calculating category distribution:', error);
@@ -257,12 +284,7 @@ class AnalyticsService {
     }
   }
 
-  // Clear all caches (useful for testing or manual refresh)
-  clearCache(): void {
-    this.metricsCache = null;
-    this.weeklyCache = null;
-    this.categoryCache = null;
-  }
+
 }
 
 export const analyticsService = new AnalyticsService();
